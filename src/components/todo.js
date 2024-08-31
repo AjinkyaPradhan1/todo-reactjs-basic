@@ -5,6 +5,9 @@ const ToDo =() => {
 
     const [inputValue,setInputValue] = useState('')
     const [todos,setTodos] = useState([])
+    const [editMode,setEditMode] = useState(false)
+    const [editValue,setEditValue] = useState('')
+    const [editId,setEditId] = useState(null)
 
     const addTodo = () => {
         if(inputValue.trim()!==''){
@@ -22,6 +25,25 @@ const ToDo =() => {
         setTodos(updateTodos)
     }
 
+    const editTodo = (id,text) => {
+        setEditMode(true)
+        setEditId(id)
+        setEditValue(text)
+    }
+
+    const updateToDo=()=>{
+        const updateTodos = todos.map((todo)=>{
+            if(todo.id===editId){
+                return{...todo,text:editValue}
+            }
+            return todo;
+        })
+        setTodos(updateTodos)
+        setEditMode(false)
+        setEditId(null)
+        setEditValue('')
+    }
+
     return(
         <div className='main'>
             <div className="content">
@@ -31,7 +53,21 @@ const ToDo =() => {
                     <input type="text" 
                     id="desc" value={inputValue}
                     onChange={(e)=>setInputValue(e.target.value)} required/><br/>
-                    <button className='btn btn-primary' onClick={addTodo}>Add ToDo</button>
+
+                    {
+                        editMode ? (
+                            <div>
+                                <input type="text"
+                                value={editValue}
+                                onChange={(e)=>setEditValue(e.target.value)}/>
+                                <button className="btn btn-primary" onClick={updateToDo}>Update</button>
+                            </div>
+                        ):(
+                            <button className='btn btn-primary' onClick={addTodo}>Add</button>
+                        )
+                    }
+
+                    {/* <button className='btn btn-primary' onClick={addTodo}>Add ToDo</button> */}
 
                 <ul>
                     {
@@ -39,7 +75,8 @@ const ToDo =() => {
                             return(
                                 <li key={todo.id}>
                                     {todo.text}&nbsp;
-                                    <button className='btn btn-danger' onClick={()=>deleteTodo(todo.id)}>Delete</button>
+                                    <button className='btn btn-danger' onClick={()=>deleteTodo(todo.id)}>Delete</button>&nbsp;
+                                    <button className='btn btn-info' onClick={()=>editTodo(todo.id,todo.text)}>Edit</button>
                                 </li>
                             );
                         })
